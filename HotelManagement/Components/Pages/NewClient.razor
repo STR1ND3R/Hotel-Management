@@ -1,0 +1,96 @@
+@page "/client/new"
+@page "/client/edit/{Id:int}"
+@using HotelManagement.Models
+@using HotelManagement.Repo
+@using Microsoft.AspNetCore.Components.Forms
+@inject IRepoClients RepoClients
+@inject NavigationManager _Navigation;
+@rendermode InteractiveServer
+
+<div class="container mt-3"> <!-- Contenedor Bootstrap con margen superior -->
+    <h3>@action Cliente</h3>
+
+    <EditForm Model="@newClient" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator /> <!-- Validación de anotaciones -->
+        <ValidationSummary class="alert alert-danger" /> <!-- Estilo de alerta para errores -->
+
+        <!-- Estilo de formulario usando Bootstrap -->
+        <div class="form-group">
+            <label for="name">Nombre:</label>
+            <InputText class="form-control" id="name" @bind-Value="newClient.Name" />
+            <ValidationMessage For="@(() => newClient.Name)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="lastName">Apellido:</label>
+            <InputText class="form-control" id="lastName" @bind-Value="newClient.LastName" />
+            <ValidationMessage For="@(() => newClient.LastName)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="email">Correo Electrónico:</label>
+            <InputText class="form-control" id="email" @bind-Value="newClient.Email" />
+            <ValidationMessage For="@(() => newClient.Email)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="phoneNumber">Número de Teléfono:</label>
+            <InputText class="form-control" id="phoneNumber" @bind-Value="newClient.PhoneNumber" />
+            <ValidationMessage For="@(() => newClient.PhoneNumber)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="address">Dirección:</label>
+            <InputText class="form-control" id="address" @bind-Value="newClient.Adress" />
+            <ValidationMessage For="@(() => newClient.Adress)" class="text-danger" />
+        </div>
+
+        <div>
+            <button class="btn btn-primary" type="submit">@action</button> <!-- Botón primario -->
+            <button class="btn btn-secondary" type="button" @onclick="ResetForm">Limpiar</button> <!-- Botón secundario -->
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private string action = "";
+    private Client? newClient = new Client();  // Instancia para el nuevo cliente
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            newClient = await RepoClients.Get(Id);
+            action = "Modificar";
+        }
+        else
+        {
+            action = "Nevo";
+        }
+    }
+    
+    private async Task HandleValidSubmit()
+    {
+        if (Id > 0)
+        {
+            await RepoClients.Update(Id, newClient!);
+        }
+        else
+        {
+            await RepoClients.Add(newClient!);
+        }
+        Cancelar();
+    }
+
+    private void ResetForm()
+    {
+        newClient = new Client();  // Restablecer el formulario
+    }
+    private void Cancelar()
+    {
+        _Navigation.NavigateTo("/clients");
+    }
+}
