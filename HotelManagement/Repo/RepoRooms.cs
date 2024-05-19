@@ -36,7 +36,7 @@ namespace HotelManagement.Repo
 
         public async Task<List<Room>> GetAll()
         {
-            return await _context.Rooms.ToListAsync();
+            return await _context.Rooms.ToListAsync<Room>();
         }
             
         public async Task Update(int id, Room room)

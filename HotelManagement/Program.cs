@@ -7,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IRepoClients, RepoClients>();
+builder.Services.AddScoped<IRepoRooms, RepoRooms>();
+builder.Services.AddScoped<IRepoReservations, RepoReservations>();
+
 builder.Services.AddDbContext<HotelManagementDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddRazorComponents()

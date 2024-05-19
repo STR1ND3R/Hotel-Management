@@ -1,0 +1,106 @@
+@page "/room/new"
+@page "/room/edit/{Id:int}"
+@using HotelManagement.Models
+@using HotelManagement.Repo
+@using Microsoft.AspNetCore.Components.Forms
+@inject IRepoRooms RepoRooms
+@inject NavigationManager _Navigation;
+@rendermode InteractiveServer
+
+<div class="container mt-3">
+    <h3>@action Room</h3>
+
+    <EditForm Model="@newRoom" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="alert alert-danger" />
+
+        <div class="form-group">
+            <label for="roomNumber">Número de Habitación:</label>
+            <InputText class="form-control" id="roomNumber" @bind-Value="newRoom.RoomNumber" />
+            <ValidationMessage For="@(() => newRoom.RoomNumber)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="type">Tipo de Habitación:</label>
+            <InputSelect class="form-control" id="type" @bind-Value="newRoom.Type">
+                @foreach (RoomType roomType in Enum.GetValues(typeof(RoomType)))
+                {
+                    <option value="@roomType">@roomType</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => newRoom.Type)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="pricePerNight">Precio por Noche:</label>
+            <InputNumber class="form-control" id="pricePerNight" @bind-Value="newRoom.PricePerNight" />
+            <ValidationMessage For="@(() => newRoom.PricePerNight)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="status">Estado de la Habitación:</label>
+            <InputSelect class="form-control" id="status" @bind-Value="newRoom.Status">
+                @foreach (RoomStatus roomStatus in Enum.GetValues(typeof(RoomStatus)))
+                {
+                    <option value="@roomStatus">@roomStatus</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => newRoom.Status)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="description">Descripción:</label>
+            <InputText class="form-control" id="description" @bind-Value="newRoom.Description" />
+            <ValidationMessage For="@(() => newRoom.Description)" class="text-danger" />
+        </div>
+
+        <div>
+            <button class="btn btn-primary" type="submit">@action</button>
+            <button class="btn btn-secondary" type="button" @onclick="ResetForm">Limpiar</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private string action = "";
+    private Room newRoom = new Room();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            newRoom = await RepoRooms.Get(Id);
+            action = "Modificar";
+        }
+        else
+        {
+            action = "Nuevo";
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id > 0)
+        {
+            await RepoRooms.Update(Id, newRoom);
+        }
+        else
+        {
+            await RepoRooms.Add(newRoom);
+        }
+        Cancelar();
+    }
+
+    private void ResetForm()
+    {
+        newRoom = new Room();
+    }
+
+    private void Cancelar()
+    {
+        _Navigation.NavigateTo("/rooms");
+    }
+}

@@ -1,0 +1,20 @@
+@page "/rooms"
+@rendermode InteractiveServer
+@inject NavigationManager _Navigation
+@inject IRepoRooms _Repo
+@using HotelManagement.Models
+@using HotelManagement.Repo
+
+
+<h1>Rooms</h1>
+
+
+@code
+{
+    private List<Room>? _rooms;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _rooms = await _Repo.GetAll();
+    }
+}
