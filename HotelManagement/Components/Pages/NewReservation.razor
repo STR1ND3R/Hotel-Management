@@ -1,7 +1,151 @@
 @page "/reservation/new"
+@page "/reservation/edit/{Id:int}"
+@using System.Text.Json
+@using HotelManagement.Models
+@using HotelManagement.Repo
+@using Microsoft.AspNetCore.Components.Forms
+@inject IRepoReservations RepoReservations
+@inject IRepoRooms RepoRooms
+@inject NavigationManager _Navigation;
+@rendermode InteractiveServer
 
-<h3>NewReservation</h3>
+<div class="container mt-3">
+    <h3>@action Reservation</h3>
+
+    <EditForm Model="@newReservation" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="alert alert-danger" />
+
+        <div class="form-group">
+            <label for="clientId">ID del Cliente:</label>
+            <InputNumber class="form-control" id="clientId" @bind-Value="newReservation.ClientId" />
+            <ValidationMessage For="@(() => newReservation.ClientId)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="roomId">ID de la Habitación:</label>
+            <InputNumber class="form-control" id="roomId" @bind-Value="newReservation.RoomId" @oninput="CalculateTotalPrice" @onkeyup="CalculateTotalPrice"/>
+            <ValidationMessage For="@(() => newReservation.RoomId)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="checkInDate">Fecha de Entrada:</label>
+            <InputDate class="form-control" id="checkInDate" @bind-Value="newReservation.CheckInDate" @oninput="CalculateTotalPrice" @onkeyup="CalculateTotalPrice"/>
+            <ValidationMessage For="@(() => newReservation.CheckInDate)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="checkOutDate">Fecha de Salida:</label>
+            <InputDate class="form-control" id="checkOutDate" @bind-Value="newReservation.CheckOutDate" @oninput="CalculateTotalPrice" @onkeyup="CalculateTotalPrice"/>
+            <ValidationMessage For="@(() => newReservation.CheckOutDate)" class="text-danger" />
+        </div>
+
+
+        <div class="form-group">
+            <label for="totalPrice">Precio por noche:</label>
+            <InputText class="form-control" id="totalPrice" @bind-Value="PricePerNight" readonly />
+        </div>
+        
+        <div class="form-group">
+            <label for="totalPrice">Precio Total:</label>
+            <InputNumber class="form-control" id="totalPrice" @bind-Value="newReservation.TotalPrice" readonly />
+            <ValidationMessage For="@(() => newReservation.TotalPrice)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <label for="status">Estado de la Reserva:</label>
+            <InputSelect value="Confirmed" class="form-control" id="status" @bind-Value="newReservation.Status">
+                <option @Value="null"></option>
+                @foreach (var status in Enum.GetValues(typeof(ReservationStatus)))
+                {
+                    <option value="@status">@status</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => newReservation.Status)" class="text-danger" />
+        </div>
+
+        <div>
+            <button class="btn btn-primary" type="submit">@action</button>
+            <button class="btn btn-secondary" type="button" @onclick="ResetForm">Limpiar</button>
+        </div>
+    </EditForm>
+</div>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private string action = "";
+    private Reservation? newReservation = new Reservation();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            newReservation = await RepoReservations.Get(Id);
+            action = "Modificar";
+        }
+        else
+        {
+            action = "Nueva";
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Id > 0)
+        {
+            await RepoReservations.Update(Id, newReservation!);
+        }
+        else
+        {
+            await RepoReservations.Add(newReservation!);
+        }
+        Cancelar();
+    }
+
+    private void ResetForm()
+    {
+        newReservation = new Reservation();
+    }
+
+    private void Cancelar()
+    {
+        _Navigation.NavigateTo("/reservations");
+    }
+    
+    private async Task CalculateTotalPrice()
+    {
+        try
+        {
+            if (newReservation.RoomId > 0)
+            {
+                var room = await RepoRooms.Get(newReservation.RoomId);
+                PricePerNight = room.PricePerNight.ToString();
+                if (room != null)
+                {
+                    var days = (newReservation.CheckOutDate - newReservation.CheckInDate).Days;
+                    newReservation.TotalPrice = room.PricePerNight * days;
+                    Console.WriteLine("Precio total calculado correctamente.");
+                }
+                else
+                {
+                    Console.WriteLine("No se pudo encontrar la habitación.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Falta información para calcular el precio total.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Se produjo un error al calcular el precio total: {ex.Message}");
+        }
+    }
+
+    private string PricePerNight { get; set; }
+    
+
     
 }

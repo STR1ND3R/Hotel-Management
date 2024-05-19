@@ -24,7 +24,7 @@ namespace HotelManagement.Models
 
         [Required(ErrorMessage = "El estado de la reserva es obligatorio")]
         [EnumDataType(typeof(ReservationStatus), ErrorMessage = "Estado de reserva no válido")]
-        public ReservationStatus Status { get; set; }
+        public string Status { get; set; }
     }
 
     public enum ReservationStatus
