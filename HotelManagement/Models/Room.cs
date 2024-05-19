@@ -10,7 +10,7 @@ namespace HotelManagement.Models
         public string RoomNumber { get; set; }
 
         [Required(ErrorMessage = "El tipo de habitacion es obligatorio")]
-        public RoomType Type { get; set; }
+        public string Type { get; set; }
 
         [Required(ErrorMessage = "El precio por noche es obligatorio")]
         [Range(0, double.MaxValue, ErrorMessage = "El precio debe ser un valor positivo")]
@@ -18,7 +18,7 @@ namespace HotelManagement.Models
 
         [Required(ErrorMessage = "El estado de la habitacion es obligatorio")]
         [EnumDataType(typeof(RoomStatus), ErrorMessage = "Estado no válido")]
-        public RoomStatus Status { get; set; }
+        public string Status { get; set; }
 
         public string Description { get; set; } // Campo opcional para descripciones adicionales
     }

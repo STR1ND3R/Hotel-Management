@@ -12,6 +12,12 @@ namespace HotelManagement.Repo
             _context = context;
         }
 
+        public async Task<List<Room>> GetAll()
+        {
+            return await _context.Rooms.ToListAsync<Room>();
+        }
+        
+        
         public async Task<Room> Add(Room room)
         {
             await _context.Rooms.AddAsync(room);
@@ -34,10 +40,6 @@ namespace HotelManagement.Repo
             return await _context.Rooms.FindAsync(id);
         }
 
-        public async Task<List<Room>> GetAll()
-        {
-            return await _context.Rooms.ToListAsync<Room>();
-        }
             
         public async Task Update(int id, Room room)
         {
@@ -49,7 +51,7 @@ namespace HotelManagement.Repo
                 roomActual.PricePerNight = room.PricePerNight;
                 roomActual.Status = room.Status;
                 roomActual.Description = room.Description;
-
+        
                 await _context.SaveChangesAsync();
             }
         }
