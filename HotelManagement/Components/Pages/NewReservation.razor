@@ -10,7 +10,7 @@
 @rendermode InteractiveServer
 
 <div class="container mt-3">
-    <h3>@action Reservation</h3>
+    <h3>@action Reservación</h3>
 
     <EditForm Model="@newReservation" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
@@ -54,7 +54,7 @@
 
         <div class="form-group">
             <label for="status">Estado de la Reserva:</label>
-            <InputSelect value="Confirmed" class="form-control" id="status" @bind-Value="newReservation.Status">
+            <InputSelect class="form-control" id="status" @bind-Value="newReservation.Status">
                 <option @Value="null"></option>
                 @foreach (var status in Enum.GetValues(typeof(ReservationStatus)))
                 {
@@ -64,7 +64,7 @@
             <ValidationMessage For="@(() => newReservation.Status)" class="text-danger" />
         </div>
 
-        <div>
+        <div class="mt-4">
             <button class="btn btn-primary" type="submit">@action</button>
             <button class="btn btn-secondary" type="button" @onclick="ResetForm">Limpiar</button>
         </div>
