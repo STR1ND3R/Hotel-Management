@@ -23,6 +23,7 @@
         <div class="form-group">
             <label for="type">Tipo de Habitación:</label>
             <InputSelect class="form-control" id="type" @bind-Value="newRoom.Type">
+                <option @Value="null"></option>
                 @foreach (RoomType roomType in Enum.GetValues(typeof(RoomType)))
                 {
                     <option value="@roomType">@roomType</option>
@@ -40,6 +41,7 @@
         <div class="form-group">
             <label for="status">Estado de la Habitación:</label>
             <InputSelect class="form-control" id="status" @bind-Value="newRoom.Status">
+                <option @Value="null"></option>
                 @foreach (RoomStatus roomStatus in Enum.GetValues(typeof(RoomStatus)))
                 {
                     <option value="@roomStatus">@roomStatus</option>
