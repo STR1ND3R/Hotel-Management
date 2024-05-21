@@ -1,5 +1,5 @@
-@page "/reservation/new"
 @page "/reservation/edit/{Id:int}"
+@page "/reservation/new/{RoomId:int}"
 @using System.Text.Json
 @using HotelManagement.Models
 @using HotelManagement.Repo
@@ -24,7 +24,7 @@
 
         <div class="form-group">
             <label for="roomId">ID de la Habitación:</label>
-            <InputNumber class="form-control" id="roomId" @bind-Value="newReservation.RoomId" @oninput="CalculateTotalPrice" @onkeyup="CalculateTotalPrice"/>
+            <InputNumber class="form-control" id="roomId" @bind-Value="newReservation.RoomId" @oninput="CalculateTotalPrice" @onkeyup="CalculateTotalPrice" readonly/>
             <ValidationMessage For="@(() => newReservation.RoomId)" class="text-danger" />
         </div>
 
@@ -74,6 +74,10 @@
 @code {
     [Parameter]
     public int Id { get; set; }
+    
+    [Parameter]
+    public int RoomId { get; set; }
+    
 
     private string action = "";
     private Reservation? newReservation = new Reservation();
@@ -85,10 +89,17 @@
             newReservation = await RepoReservations.Get(Id);
             action = "Modificar";
         }
+
+        if (RoomId  > 0)
+        {
+            action = "Nueva";
+            newReservation.RoomId = RoomId;
+        }
         else
         {
             action = "Nueva";
         }
+            await CalculateTotalPrice();
     }
 
     private async Task HandleValidSubmit()
